@@ -9,28 +9,25 @@ app.get("/scrape", async (req, res) => {
 
   try {
     const browser = await puppeteer.launch({
-      args: ["--no-sandbox"],
-      headless: "new"
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
-    const page = await browser.newPage();
 
+    const page = await browser.newPage();
     await page.goto(url, { waitUntil: "networkidle2" });
 
-    // ❗ Tuỳ chỉnh theo Sephora
-    const data = await page.evaluate(() => {
-      return {
-        title: document.querySelector("h1")?.innerText || null,
-        price: document.querySelector("[data-comp='Price ']")?.innerText || null,
-        images: [...document.querySelectorAll("img")].map(i => i.src)
-      };
-    });
+    const data = await page.evaluate(() => ({
+      title: document.querySelector("h1")?.innerText || "",
+      price: document.querySelector("[data-at='price']")?.innerText || "",
+      images: [...document.querySelectorAll("img")].map(i => i.src)
+    }));
 
     await browser.close();
     res.json({ success: true, data });
 
-  } catch (err) {
-    res.json({ error: true, message: err.toString() });
+  } catch (error) {
+    res.json({ error: error.toString() });
   }
 });
 
-app.listen(3000, () => console.log("Server running on port 3000"));
+app.listen(3000, () => console.log("Server ready on 3000"));
