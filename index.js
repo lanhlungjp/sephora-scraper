@@ -5,7 +5,7 @@ const app = express();
 
 app.get("/scrape", async (req, res) => {
   const url = req.query.url;
-  if (!url) return res.json({ error: "Missing ?url=" });
+  if (!url) return res.json({ error: "Missing ?url" });
 
   try {
     const browser = await puppeteer.launch({
@@ -31,4 +31,4 @@ app.get("/scrape", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log("Server ready on " + PORT));
+app.listen(PORT, () => console.log("Server running on " + PORT));
